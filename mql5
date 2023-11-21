@@ -1,0 +1,87 @@
+
+// Lucky Euro MT4 forex software
+// Developer's site: forexroboteasy.com
+// Development: Forex Robot Easy Team
+
+// Scalping Strategy
+// Implementing a scalping strategy using pending orders
+// Each order should have a Stop Loss and Take Profit
+
+// Trading Pair
+// Optimizing the Expert Advisor for trading the EURUSD pair on the one-hour timeframe
+
+// Low Spread Requirement
+// Utilizing brokers and accounts with a low spread of 10 points or less
+// Implementing necessary functions to minimize trading costs
+
+// Importing MQL5 standard library
+#include <Trade\Trade.mqh>
+#include <Trade\PositionInfo.mqh>
+
+// Initializing the Expert Advisor
+int OnInit()
+{
+    // Setting up the trading pair and timeframe
+    Symbol('EURUSD');
+    Period(Period_H1);
+
+    // Setting up the low spread requirement
+    double spreadLimit = 10; // Minimum spread limit in points
+
+    // Checking if the current spread is within the limit
+    if (SymbolInfoDouble(_Symbol, SYMBOL_SPREAD) <= spreadLimit)
+    {
+        // Implementing the scalping strategy using pending orders
+        // Calculating the Stop Loss and Take Profit levels based on risk management rules
+        double stopLoss = Bid - 100 * _Point; // Stop Loss level
+        double takeProfit = Ask + 100 * _Point; // Take Profit level
+
+        // Opening a Buy Limit order
+        if (OrderSend(_Symbol, OP_BUYLIMIT, 1, Ask - 10 * _Point, 0, stopLoss, takeProfit, 'Buy Limit', MagicNumber()))
+        {
+            // Buy Limit order successfully placed
+            Print('Buy Limit order placed.');
+        }
+        else
+        {
+            // Error placing Buy Limit order
+            Print('Error placing Buy Limit order: ', GetLastError());
+        }
+
+        // Opening a Sell Limit order
+        if (OrderSend(_Symbol, OP_SELLLIMIT, 1, Bid + 10 * _Point, 0, stopLoss, takeProfit, 'Sell Limit', MagicNumber()))
+        {
+            // Sell Limit order successfully placed
+            Print('Sell Limit order placed.');
+        }
+        else
+        {
+            // Error placing Sell Limit order
+            Print('Error placing Sell Limit order: ', GetLastError());
+        }
+    }
+    else
+    {
+        // Spread is higher than the allowed limit
+        Print('Spread is higher than the allowed limit.');
+    }
+
+    return(INIT_SUCCEEDED);
+}
+
+// Closing all open positions before deinitialization
+void OnDeinit(const int reason)
+{
+    // Closing all open positions
+    CPositionInfo position;
+    while (position.SelectByTicket(PositionsTotal() - 1))
+    {
+        position.Close();
+    }
+}
+
+// Logical conclusion of the code
+void OnTick()
+{
+    // No logic required for this example
+}
